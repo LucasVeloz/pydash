@@ -16,9 +16,9 @@ class R2AHashTest(unittest.TestCase):
 
   def test_quality_by_time(self):
     self.assertEqual(self.r2aHash.get_quality_by_time(0.01), 'H')
-    self.assertEqual(self.r2aHash.get_quality_by_time(0.1), 'HM')
+    self.assertEqual(self.r2aHash.get_quality_by_time(0.8), 'HM')
     self.assertEqual(self.r2aHash.get_quality_by_time(1), 'HL')
-    self.assertEqual(self.r2aHash.get_quality_by_time(0.09), 'HM')
+    self.assertEqual(self.r2aHash.get_quality_by_time(0.6), 'HM')
     self.assertEqual(self.r2aHash.get_quality_by_time(0.9), 'HM')
     self.assertEqual(self.r2aHash.get_quality_by_time(9), 'HL')
     self.assertEqual(self.r2aHash.get_quality_by_time(0.009), 'H')
@@ -26,9 +26,9 @@ class R2AHashTest(unittest.TestCase):
     self.r2aHash.current_quality['old'] = 'M'
 
     self.assertEqual(self.r2aHash.get_quality_by_time(0.01), 'MH')
-    self.assertEqual(self.r2aHash.get_quality_by_time(0.1), 'M')
+    self.assertEqual(self.r2aHash.get_quality_by_time(0.8), 'M')
     self.assertEqual(self.r2aHash.get_quality_by_time(1), 'ML')
-    self.assertEqual(self.r2aHash.get_quality_by_time(0.09), 'M')
+    self.assertEqual(self.r2aHash.get_quality_by_time(0.5), 'M')
     self.assertEqual(self.r2aHash.get_quality_by_time(0.9), 'M')
     self.assertEqual(self.r2aHash.get_quality_by_time(9), 'ML')
     self.assertEqual(self.r2aHash.get_quality_by_time(0.009), 'MH')
@@ -36,9 +36,9 @@ class R2AHashTest(unittest.TestCase):
     self.r2aHash.current_quality['old'] = 'L'
 
     self.assertEqual(self.r2aHash.get_quality_by_time(0.01), 'LH')
-    self.assertEqual(self.r2aHash.get_quality_by_time(0.1), 'LM')
+    self.assertEqual(self.r2aHash.get_quality_by_time(0.8), 'LM')
     self.assertEqual(self.r2aHash.get_quality_by_time(1), 'L')
-    self.assertEqual(self.r2aHash.get_quality_by_time(0.09), 'LM')
+    self.assertEqual(self.r2aHash.get_quality_by_time(0.6), 'LM')
     self.assertEqual(self.r2aHash.get_quality_by_time(0.9), 'LM')
     self.assertEqual(self.r2aHash.get_quality_by_time(9), 'L')
     self.assertEqual(self.r2aHash.get_quality_by_time(0.009), 'LH')

@@ -24,18 +24,19 @@ class R2AHash(IR2A):
     }
     self.hash = {
       'L': 1,
-      'M': 0.3,
-      'H': 0.2,
+      'M': 0.8,
+      'H': 0.3,
     }
   def handle_xml_request(self, msg):
     self.send_down(msg)
   
   def handle_xml_response(self, msg):
     self.quality_id = parse_mpd(msg.get_payload()).get_qi()
-    self.current_quality_id = len(self.quality_id) - 1
+    self.current_quality_id = floor((len(self.quality_id) - 1)/2)
     self.send_up(msg)
 
   def get_quality_id(self):
+    print(f'--------> {self.current_quality}, {self.timer}')
     return self.quality_id[self.current_quality_id]
   
   def get_quality_by_time(self, timer):
@@ -95,7 +96,7 @@ class R2AHash(IR2A):
     if value == 'L' and old == 'HM':
       return 'H'
     if value == 'L' and old == 'HL':
-      return 'H'
+      return 'L'
     if value == 'L' and old == 'MH':
       return 'M'
     if value == 'L' and old == 'ML':
@@ -108,14 +109,18 @@ class R2AHash(IR2A):
 
   def update_quality_id(self):
     quality = self.current_quality.get('current')
+    old = self.current_quality.get('old')
+    average = self.timer.get('average')
     len_quality = len(quality)
     current = self.current_quality_id
     min = 0
     max = len(self.quality_id) - 1
-    mid = floor(max/2)
 
     if len_quality != 1:
       quality = quality[0]
+
+    if average >= 5:
+      self.current_quality_id = min
     
     if quality == 'L':
       if current - 1 >= min:
