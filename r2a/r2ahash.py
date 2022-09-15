@@ -2,11 +2,6 @@ from math import floor
 import time
 from player.parser import parse_mpd
 from r2a.ir2a import IR2A
-from dotenv import dotenv_values
-
-
-ENV = dotenv_values('.env')
-MAX_LENGTH = int(ENV['MAX_LEN'])
 
 class R2AHash(IR2A):
   def __init__(self, id):
@@ -38,73 +33,31 @@ class R2AHash(IR2A):
   def get_quality_id(self):
     print(f'--------> {self.current_quality}, {self.timer}')
     return self.quality_id[self.current_quality_id]
+
+  def get_primary_time(self, time):
+
+    if time <= self.hash['H']:
+      return 'H'
+
+    if time >= self.hash['L']:
+      return 'L'
+
+    if time > self.hash['H'] and time <= self.hash['M']:
+      return 'M'
+    if time >= self.hash['M'] and time < self.hash['L']:
+      return 'M'
   
   def get_quality_by_time(self, timer):
-    value = 'L'
-    if timer >= self.hash['L']:
-      value = 'L'
-    elif timer <= self.hash['H']:
-      value = 'H'
-    elif timer > self.hash['H'] and timer <= self.hash['M']:
-      value = 'M'
-    elif timer >= self.hash['M'] and timer < self.hash['L']:
-      value = 'M'
-
+    current = self.get_primary_time(timer)
     old = self.current_quality.get('old')
 
-    if value == 'H' and old == 'M':
-      return 'MH'
-    if value == 'H' and old == 'L':
-      return 'LH'
-    if value == 'M' and old == 'H':
-      return 'HM'
-    if value == 'M' and old == 'L':
-      return 'LM'
-    if value == 'L' and old == 'H':
-      return 'HL'
-    if value == 'L' and old == 'M':
-      return 'ML'
-    if value == old:
-      return value
+    if len(old) == 2:
+      if old[1] != current and old[0] != current:
+        return old[0]
+    elif old != current:
+      return old + current
 
-    if value == 'H' and old == 'HM':
-      return 'H'
-    if value == 'H' and old == 'HL':
-      return 'H'
-    if value == 'H' and old == 'MH':
-      return 'H'
-    if value == 'H' and old == 'ML':
-      return 'M'
-    if value == 'H' and old == 'LH':
-      return 'H'
-    if value == 'H' and old == 'LM':
-      return 'L'
-    
-    if value == 'M' and old == 'HM':
-      return 'M'
-    if value == 'M' and old == 'HL':
-      return 'H'
-    if value == 'M' and old == 'MH':
-      return 'M'
-    if value == 'M' and old == 'ML':
-      return 'M'
-    if value == 'M' and old == 'LH':
-      return 'L'
-    if value == 'M' and old == 'LM':
-      return 'M'
-    
-    if value == 'L' and old == 'HM':
-      return 'H'
-    if value == 'L' and old == 'HL':
-      return 'L'
-    if value == 'L' and old == 'MH':
-      return 'M'
-    if value == 'L' and old == 'ML':
-      return 'L'
-    if value == 'L' and old == 'LH':
-      return 'L'
-    if value == 'L' and old == 'LM':
-      return 'L'
+    return current
 
 
   def update_quality_id(self):
@@ -156,5 +109,4 @@ class R2AHash(IR2A):
     pass
 
   def finalization(self):
-    self.hash.clear()
     pass
