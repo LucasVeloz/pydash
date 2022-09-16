@@ -2,6 +2,9 @@ from math import floor
 import time
 from player.parser import parse_mpd
 from r2a.ir2a import IR2A
+from dotenv import dotenv_values
+
+ENV = dotenv_values('.env')
 
 class R2AHash(IR2A):
   def __init__(self, id):
@@ -18,9 +21,9 @@ class R2AHash(IR2A):
       'old': 'H'
     }
     self.hash = {
-      'L': 1,
-      'M': 0.8,
-      'H': 0.3,
+      'L': int(ENV['LOW']),
+      'M': float(ENV['MEDIUM']),
+      'H': float(ENV['HIGH']),
     }
   def handle_xml_request(self, msg):
     self.send_down(msg)
@@ -35,16 +38,17 @@ class R2AHash(IR2A):
     return self.quality_id[self.current_quality_id]
 
   def get_primary_time(self, time):
+    timer = round(time)
 
-    if time <= self.hash['H']:
+    if timer <= self.hash['H']:
       return 'H'
 
-    if time >= self.hash['L']:
+    if timer >= self.hash['L']:
       return 'L'
 
-    if time > self.hash['H'] and time <= self.hash['M']:
+    if timer > self.hash['H'] and timer <= self.hash['M']:
       return 'M'
-    if time >= self.hash['M'] and time < self.hash['L']:
+    if timer >= self.hash['M'] and timer < self.hash['L']:
       return 'M'
   
   def get_quality_by_time(self, timer):
@@ -59,10 +63,8 @@ class R2AHash(IR2A):
 
     return current
 
-
   def update_quality_id(self):
     quality = self.current_quality.get('current')
-    old = self.current_quality.get('old')
     average = self.timer.get('average')
     len_quality = len(quality)
     current = self.current_quality_id
@@ -92,7 +94,6 @@ class R2AHash(IR2A):
     self.current_quality.update({'old': current})
     self.current_quality.update({'current': new_quality})
       
-
   def handle_segment_size_request(self, msg):
     self.timer.update({'start': time.perf_counter()})
     msg.add_quality_id(self.get_quality_id())
